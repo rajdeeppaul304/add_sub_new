@@ -141,7 +141,7 @@
 
         const displayQuestion = () => {
             const question = test.questions[currentQuestionIndex];
-            questionElement.textContent = `Question ${currentQuestionIndex + 1}: ${question.lhs} ${question.operator} ${question.rhs} = ?`;
+            questionElement.textContent = `Question ${currentQuestionIndex + 1}: ${question.lhs} ${question.operator === '*' ? 'x' : question.operator} ${question.rhs} = ?`;
             answerInput.value = '';
             answerInput.focus();
         };

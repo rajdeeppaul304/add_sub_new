@@ -4,189 +4,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Quiz Generator</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom Styles */
-        body {
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    <title>Math Test</title>
 </head>
 
-<body class="bg-gray-50 p-4">
-    <div class="max-w-xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-        <h1 class="text-3xl text-center font-bold mb-6">Math Quiz Generator</h1>
-
-        <!-- Input Form -->
-        <div id="quizForm" class="space-y-4">
-            <label for="operand" class="block">Choose Operand:</label>
-            <select id="operand" class="w-full p-2 border rounded">
-                <option value="+">Addition (+)</option>
-                <option value="-">Subtraction (-)</option>
-                <option value="x">Multiplication (x)</option>
-                <option value="/">Division (/)</option>
-            </select>
-
-            <label for="lhsRange" class="block">LHS Range (Min - Max):</label>
-            <input type="number" id="lhsMin" class="w-full p-2 border rounded" placeholder="Min" required>
-            <input type="number" id="lhsMax" class="w-full p-2 border rounded" placeholder="Max" required>
-
-            <label for="rhsRange" class="block">RHS Range (Min - Max):</label>
-            <input type="number" id="rhsMin" class="w-full p-2 border rounded" placeholder="Min" required>
-            <input type="number" id="rhsMax" class="w-full p-2 border rounded" placeholder="Max" required>
-
-            <label for="numQuestions" class="block">Number of Questions:</label>
-            <input type="number" id="numQuestions" class="w-full p-2 border rounded" placeholder="Number of Questions" required>
-
-            <button id="generateQuizBtn" class="w-full p-3 bg-blue-500 text-white rounded">Generate Quiz</button>
-        </div>
-
-        <!-- Quiz Section -->
-        <div id="quizSection" class="hidden mt-6">
-            <h2 id="questionNumber" class="text-2xl font-semibold mb-4">Question 1</h2>
-            <div id="question" class="text-xl mb-4">What is 0 ?</div>
-            <input type="number" id="answer" class="w-full p-2 border rounded mb-4" placeholder="Your answer">
-            <button id="submitAnswerBtn" class="w-full p-3 bg-green-500 text-white rounded">Submit Answer</button>
-
-            <div id="quizResult" class="hidden mt-4 text-center">
-                <h3 class="text-2xl">Quiz Completed!</h3>
-                <p id="finalScore" class="text-xl"></p>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+        <h1 class="text-xl font-bold text-center mb-4">Math Test Generator</h1>
+        <form id="test-form" class="space-y-4">
+            <div>
+                <label for="operator" class="block text-sm font-medium text-gray-700">Choose an Operator</label>
+                <select id="operator"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <option value="+">Addition (+)</option>
+                    <option value="-">Subtraction (-)</option>
+                    <option value="*">Multiplication (x)</option>
+                    <option value="/">Division (/)</option>
+                </select>
             </div>
+
+            <div>
+                <label for="lhs-range" class="block text-sm font-medium text-gray-700">LHS Range</label>
+                <input type="text" id="lhs-range" placeholder="e.g., 1-10"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label for="rhs-range" class="block text-sm font-medium text-gray-700">RHS Range</label>
+                <input type="text" id="rhs-range" placeholder="e.g., 1-10"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <div>
+                <label for="num-questions" class="block text-sm font-medium text-gray-700">Number of Questions</label>
+                <input type="number" id="num-questions" placeholder="e.g., 5"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            </div>
+
+            <button type="submit"
+                class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700">Generate
+                Test</button>
+        </form>
+    </div>
+
+    <div id="test-container" class="w-full max-w-md mt-6 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 id="question" class="text-lg font-bold mb-4">Question</h2>
+            <input id="answer" type="number" placeholder="Your Answer"
+                class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 mb-4">
+            <button id="submit-answer"
+                class="w-full bg-green-600 text-white py-2 px-4 rounded-md shadow hover:bg-green-700">Submit
+                Answer</button>
+        </div>
+    </div>
+
+    <div id="results-container" class="w-full max-w-md mt-6 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-lg font-bold mb-4">Results</h2>
+            <p id="results" class="text-gray-700"></p>
+            <button id="restart-test"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md shadow hover:bg-blue-700">Restart
+                Test</button>
         </div>
     </div>
 
     <script>
-        // Helper function to store quiz data in localStorage
-        function storeQuizData(quizData) {
-            localStorage.setItem('quizData', JSON.stringify(quizData));
-        }
+        const testForm = document.getElementById('test-form');
+        const testContainer = document.getElementById('test-container');
+        const resultsContainer = document.getElementById('results-container');
+        const questionElement = document.getElementById('question');
+        const answerInput = document.getElementById('answer');
+        const submitAnswerButton = document.getElementById('submit-answer');
+        const resultsElement = document.getElementById('results');
+        const restartTestButton = document.getElementById('restart-test');
 
-        // Helper function to get quiz data from localStorage
-        function getQuizData() {
-            return JSON.parse(localStorage.getItem('quizData'));
-        }
+        let test = null;
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
 
-        // Function to generate a random number within a given range
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        const saveTestToLocalStorage = () => {
+            localStorage.setItem('mathTest', JSON.stringify(test));
+        };
 
-        // Function to create a question based on the operand
-        function generateQuestion(operand, lhsMin, lhsMax, rhsMin, rhsMax) {
-            const lhs = getRandomInt(lhsMin, lhsMax);
-            const rhs = getRandomInt(rhsMin, rhsMax);
-            let question;
-            let correctAnswer;
+        const loadTestFromLocalStorage = () => {
+            const savedTest = localStorage.getItem('mathTest');
+            return savedTest ? JSON.parse(savedTest) : null;
+        };
 
-            switch (operand) {
-                case '+':
-                    question = `${lhs} + ${rhs}`;
-                    correctAnswer = lhs + rhs;
-                    break;
-                case '-':
-                    question = `${lhs} - ${rhs}`;
-                    correctAnswer = lhs - rhs;
-                    break;
-                case 'x':
-                    question = `${lhs} x ${rhs}`;
-                    correctAnswer = lhs * rhs;
-                    break;
-                case '/':
-                    // Make sure rhs is not 0 and lhs is divisible by rhs
-                    while (rhs === 0 || lhs % rhs !== 0) {
-                        lhs = getRandomInt(lhsMin, lhsMax);
-                        rhs = getRandomInt(rhsMin, rhsMax);
+        const generateQuestion = (lhsRange, rhsRange, operator) => {
+            const [lhsMin, lhsMax] = lhsRange.split('-').map(Number);
+            const [rhsMin, rhsMax] = rhsRange.split('-').map(Number);
+
+            let lhs, rhs;
+
+            if (operator === '/') {
+                // Generate a random lhs within the restricted range (half of the top range of lhsRange)
+                lhs = Math.floor(Math.random() * ((lhsMax / 2) - lhsMin + 1)) + lhsMin;
+
+                // Generate a valid rhs that ensures perfect division
+                const possibleRhs = [];
+                for (let i = rhsMin; i <= rhsMax; i++) {
+                    if (i !== 0 && lhs % i === 0) {
+                        possibleRhs.push(i);
                     }
-                    question = `${lhs} / ${rhs}`;
-                    correctAnswer = lhs / rhs;
-                    break;
-            }
+                }
 
-            return { question, correctAnswer };
-        }
-
-        // Function to start quiz generation
-        function startQuiz() {
-            const operand = document.getElementById('operand').value;
-            const lhsMin = parseInt(document.getElementById('lhsMin').value);
-            const lhsMax = parseInt(document.getElementById('lhsMax').value);
-            const rhsMin = parseInt(document.getElementById('rhsMin').value);
-            const rhsMax = parseInt(document.getElementById('rhsMax').value);
-            const numQuestions = parseInt(document.getElementById('numQuestions').value);
-
-            if (isNaN(lhsMin) || isNaN(lhsMax) || isNaN(rhsMin) || isNaN(rhsMax) || isNaN(numQuestions)) {
-                alert('Please enter valid numbers!');
-                return;
-            }
-
-            let questions = [];
-            for (let i = 0; i < numQuestions; i++) {
-                const { question, correctAnswer } = generateQuestion(operand, lhsMin, lhsMax, rhsMin, rhsMax);
-                questions.push({ question, correctAnswer });
-            }
-
-            // Store quiz data in localStorage
-            const quizData = { questions, currentQuestion: 0, answers: [], score: 0 };
-            storeQuizData(quizData);
-            showQuestion(quizData);
-        }
-
-        // Function to show the question
-        function showQuestion(quizData) {
-            const { questions, currentQuestion } = quizData;
-
-            if (currentQuestion < questions.length) {
-                document.getElementById('question').innerText = questions[currentQuestion].question;
-                document.getElementById('questionNumber').innerText = `Question ${currentQuestion + 1}`;
-                document.getElementById('answer').value = '';
-                document.getElementById('submitAnswerBtn').disabled = false;
+                if (possibleRhs.length === 0) {
+                    // If no valid rhs exists, fallback to a default valid pair
+                    rhs = lhs; // Perfect division by itself
+                } else {
+                    rhs = possibleRhs[Math.floor(Math.random() * possibleRhs.length)];
+                }
+            } else if (operator === '-') {
+                // Generate lhs and ensure rhs is smaller or equal to lhs
+                lhs = Math.floor(Math.random() * (lhsMax - lhsMin + 1)) + lhsMin;
+                rhs = Math.floor(Math.random() * (lhs - rhsMin + 1)) + rhsMin; // rhs should be <= lhs
             } else {
-                showQuizResult(quizData);
-            }
-        }
-
-        // Function to show the quiz result
-        function showQuizResult(quizData) {
-            const { score, questions } = quizData;
-            document.getElementById('quizSection').classList.add('hidden');
-            document.getElementById('quizResult').classList.remove('hidden');
-            document.getElementById('finalScore').innerText = `You scored ${score} out of ${questions.length}!`;
-        }
-
-        // Function to handle answer submission
-        function submitAnswer() {
-            const quizData = getQuizData();
-            const answer = parseFloat(document.getElementById('answer').value);
-            const { questions, currentQuestion } = quizData;
-
-            if (isNaN(answer)) {
-                alert('Please enter a valid number for the answer!');
-                return;
+                // Generate random numbers for other operators
+                lhs = Math.floor(Math.random() * (lhsMax - lhsMin + 1)) + lhsMin;
+                rhs = Math.floor(Math.random() * (rhsMax - rhsMin + 1)) + rhsMin;
             }
 
-            quizData.answers.push(answer);
-            if (answer === questions[currentQuestion].correctAnswer) {
-                quizData.score++;
+            return { lhs, rhs, operator };
+
+        };
+
+        const calculateAnswer = ({ lhs, rhs, operator }) => {
+            switch (operator) {
+                case '+': return lhs + rhs;
+                case '-': return lhs - rhs;
+                case '*': return lhs * rhs;
+                case '/': return parseFloat((lhs / rhs).toFixed(2));
+                default: return null;
+            }
+        };
+
+        const displayQuestion = () => {
+            const question = test.questions[currentQuestionIndex];
+            questionElement.textContent = `Question ${currentQuestionIndex + 1}: ${question.lhs} ${question.operator} ${question.rhs} = ?`;
+            answerInput.value = '';
+            answerInput.focus();
+        };
+
+        const showResults = () => {
+            testContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            const incorrectAnswers = test.questions
+                .map((question, index) => {
+                    const correctAnswer = calculateAnswer(question);
+                    const userAnswer = test.answers[index];
+                    if (userAnswer !== correctAnswer) {
+                        return `Q${index + 1}: ${question.lhs} ${question.operator} ${question.rhs} = ${correctAnswer} (Your answer: ${userAnswer})`;
+                    }
+                    return null;
+                })
+                .filter((result) => result !== null);
+
+            if (incorrectAnswers.length === 0) {
+                resultsElement.textContent = `Congratulations! You scored ${correctAnswers} out of ${test.questions.length}!`;
+            } else {
+                resultsElement.innerHTML = `
+        <p>You scored ${correctAnswers} out of ${test.questions.length}.</p>
+        <p class="font-bold">Incorrect Questions:</p>
+        <ul class="list-disc pl-5 text-red-600">
+          ${incorrectAnswers.map((item) => `<li>${item}</li>`).join('')}
+        </ul>
+      `;
             }
 
-            quizData.currentQuestion++;
-            storeQuizData(quizData);
-            showQuestion(quizData);
-        }
+            localStorage.removeItem('mathTest');
+        };
 
-        // Event listeners
-        document.getElementById('generateQuizBtn').addEventListener('click', startQuiz);
-        document.getElementById('submitAnswerBtn').addEventListener('click', submitAnswer);
 
-        // Check if there's existing quiz data in localStorage
-        const savedQuizData = getQuizData();
-        if (savedQuizData) {
-            document.getElementById('quizForm').classList.add('hidden');
-            document.getElementById('quizSection').classList.remove('hidden');
-            showQuestion(savedQuizData);
-        }
+        testForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const operator = document.getElementById('operator').value;
+            const lhsRange = document.getElementById('lhs-range').value || "1-100";
+            const rhsRange = document.getElementById('rhs-range').value || "1-100";
+            const numQuestions = parseInt(document.getElementById('num-questions').value, 10);
 
+            test = {
+                questions: Array.from({ length: numQuestions }, () => generateQuestion(lhsRange, rhsRange, operator)),
+                answers: [],
+            };
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+
+            saveTestToLocalStorage();
+            testForm.parentElement.classList.add('hidden');
+            testContainer.classList.remove('hidden');
+            displayQuestion();
+        });
+
+        submitAnswerButton.addEventListener('click', () => {
+            const userAnswer = parseFloat(answerInput.value);
+            const correctAnswer = calculateAnswer(test.questions[currentQuestionIndex]);
+
+            test.answers.push(userAnswer);
+            if (userAnswer === correctAnswer) correctAnswers++;
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < test.questions.length) {
+                displayQuestion();
+            } else {
+                showResults();
+            }
+            saveTestToLocalStorage();
+        });
+
+        restartTestButton.addEventListener('click', () => {
+            localStorage.removeItem('mathTest'); // Clear saved test data
+            location.reload(); // Reload the page
+        });
+
+
+        window.addEventListener('load', () => {
+
+
+            const savedTest = loadTestFromLocalStorage();
+            if (savedTest) {
+                test = savedTest;
+                currentQuestionIndex = test.answers.length;
+                correctAnswers = test.answers.filter((answer, index) => answer === calculateAnswer(test.questions[index])).length;
+
+                testForm.parentElement.classList.add('hidden');
+                if (currentQuestionIndex < test.questions.length) {
+                    testContainer.classList.remove('hidden');
+                    displayQuestion();
+                } else {
+                    showResults();
+                }
+            }
+        });
     </script>
 </body>
 
